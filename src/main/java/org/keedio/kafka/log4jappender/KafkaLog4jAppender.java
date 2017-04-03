@@ -24,6 +24,7 @@ import org.apache.kafka.common.config.SslConfigs;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.helpers.LogLog;
 import org.apache.log4j.spi.LoggingEvent;
+import org.keedio.kafka.custom.CustomFunctionality;
 
 import java.util.Date;
 import java.util.Properties;
@@ -214,7 +215,8 @@ public class KafkaLog4jAppender extends AppenderSkeleton {
 
   @Override
   protected void append(LoggingEvent event) {
-    String message = subAppend(event);
+    CustomFunctionality cf = new CustomFunctionality();
+    String message = cf.subAppend(layout, event);
     LogLog.debug("[" + new Date(event.getTimeStamp()) + "]" + message);
     Future<RecordMetadata> response = producer.send(new ProducerRecord<byte[], byte[]>(topic, message.getBytes()));
     if (syncSend) {
@@ -226,10 +228,6 @@ public class KafkaLog4jAppender extends AppenderSkeleton {
         throw new RuntimeException(ex);
       }
     }
-  }
-
-  private String subAppend(LoggingEvent event) {
-    return (this.layout == null) ? event.getRenderedMessage() : this.layout.format(event);
   }
 
   public void close() {

@@ -77,7 +77,9 @@ public class KafkaLog4jAppenderTest {
   }
 
   private byte[] getMessage(int i) throws UnsupportedEncodingException {
-    return ("test_" + i).getBytes("UTF-8");
+    byte[] something = ("test 1 \t\ntest 2aAeér^¨;:_" + i).getBytes("UTF-8");
+    //System.out.println("something... " + "test 1 \n\ttest 2aAeér^¨;:_");
+    return something;
   }
 
   private Properties getLog4jConfig() {
