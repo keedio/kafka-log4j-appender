@@ -64,6 +64,18 @@ public class KafkaLog4jAppenderTest {
     }
   }
 
+    @Test
+    public void testLog4jAppendException() {
+        PropertyConfigurator.configure(getLog4jConfig());
+
+        try {
+            throw new RuntimeException("Test exception");
+        } catch (Exception e){
+            e.printStackTrace();
+            logger.info("this is a test exception", e);
+        }
+    }
+
   @Test
   public void testLog4jAppends() throws UnsupportedEncodingException {
     PropertyConfigurator.configure(getLog4jConfig());
@@ -77,9 +89,7 @@ public class KafkaLog4jAppenderTest {
   }
 
   private byte[] getMessage(int i) throws UnsupportedEncodingException {
-    byte[] something = ("test 1 \t\ntest 2aAeér^¨;:_" + i).getBytes("UTF-8");
-    //System.out.println("something... " + "test 1 \n\ttest 2aAeér^¨;:_");
-    return something;
+    return ("test_" + i).getBytes("UTF-8");
   }
 
   private Properties getLog4jConfig() {
