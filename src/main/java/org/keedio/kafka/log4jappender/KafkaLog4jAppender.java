@@ -17,8 +17,6 @@
 
 package org.keedio.kafka.log4jappender;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.common.config.ConfigException;
@@ -29,9 +27,7 @@ import org.apache.log4j.spi.LoggingEvent;
 import org.keedio.kafka.custom.CustomFunctionality;
 
 import java.util.Date;
-import java.util.Map;
 import java.util.Properties;
-import java.util.TreeMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Logger;
@@ -222,7 +218,8 @@ public class KafkaLog4jAppender extends AppenderSkeleton {
 
   @Override
   protected void append(LoggingEvent event) {
-    String message = subAppend(event);
+    CustomFunctionality cf = new CustomFunctionality();
+    String message = cf.subAppend(event);
     LogLog.debug("[" + new Date(event.getTimeStamp()) + "]" + message);
     Future<RecordMetadata> response = producer.send(new ProducerRecord<byte[], byte[]>(topic, message.getBytes()));
     if (syncSend) {
@@ -236,17 +233,6 @@ public class KafkaLog4jAppender extends AppenderSkeleton {
     }
   }
 
-  private String subAppend(LoggingEvent event) {
-    Map eventAsMap = eventToMap(event);
-    String json = null;
-    try {
-      json = new ObjectMapper().writeValueAsString(eventAsMap);
-    } catch (JsonProcessingException e) {
-      e.printStackTrace();
-    }
-    return json;
-  }
-
   public void close() {
     if (!this.closed) {
       this.closed = true;
@@ -258,20 +244,6 @@ public class KafkaLog4jAppender extends AppenderSkeleton {
     return true;
   }
 
-  private static Map<String,Object> eventToMap(final LoggingEvent event) {
-    final Map<String, Object> em = new TreeMap<String, Object>() {{
-      put("fqnOfCategoryClass", event.getFQNOfLoggerClass());
-      put("categoryName", event.getLogger().getName());
-      put("level", event.getLevel().toString());
-      put("ndc", event.getNDC());
-      put("message", event.getMessage());
-      put("renderedMessage", event.getRenderedMessage());
-      put("threadName", event.getThreadName());
-      put("timeStamp", event.getTimeStamp());
-      put("locationInfo", event.getLocationInformation());
-      put("throwableInfo", event.getThrowableInformation());
-    }};
-    return em;
-  }
+
 
 }
