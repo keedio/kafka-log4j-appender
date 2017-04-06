@@ -30,14 +30,11 @@ import java.util.Date;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.logging.Logger;
 
 /**
  * A log4j appender that produces log messages to Kafka
  */
 public class KafkaLog4jAppender extends AppenderSkeleton {
-
-  private static final Logger LOGGER = Logger.getLogger(CustomFunctionality.class.getName());
 
   private static final String BOOTSTRAP_SERVERS_CONFIG = ProducerConfig.BOOTSTRAP_SERVERS_CONFIG;
   private static final String COMPRESSION_TYPE_CONFIG = ProducerConfig.COMPRESSION_TYPE_CONFIG;
@@ -243,7 +240,5 @@ public class KafkaLog4jAppender extends AppenderSkeleton {
   public boolean requiresLayout() {
     return true;
   }
-
-
 
 }
