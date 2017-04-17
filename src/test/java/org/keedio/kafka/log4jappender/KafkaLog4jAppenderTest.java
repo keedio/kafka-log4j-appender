@@ -51,8 +51,6 @@ public class KafkaLog4jAppenderTest {
     props = new Properties();
     props.put("log4j.rootLogger", "INFO");
     props.put("log4j.appender.KAFKA", "org.keedio.kafka.log4jappender.KafkaLog4jAppender");
-    props.put("log4j.appender.KAFKA.layout", "org.apache.log4j.PatternLayout");
-    props.put("log4j.appender.KAFKA.layout.ConversionPattern", "%-5p: %c - %m%n");
     props.put("log4j.appender.KAFKA.brokerList", "127.0.0.1:9093");
     props.put("log4j.logger.kafka.log4j", "INFO, KAFKA");
 
@@ -63,18 +61,6 @@ public class KafkaLog4jAppenderTest {
       // It's OK!
     }
   }
-
-    @Test
-    public void testLog4jAppendException() {
-        PropertyConfigurator.configure(getLog4jConfig());
-
-        try {
-            throw new RuntimeException("Test exception");
-        } catch (Exception e){
-            e.printStackTrace();
-            logger.info("this is a test exception", e);
-        }
-    }
 
   @Test
   public void testLog4jAppends() throws UnsupportedEncodingException {
@@ -96,11 +82,8 @@ public class KafkaLog4jAppenderTest {
     Properties props = new Properties();
     props.put("log4j.rootLogger", "INFO, KAFKA");
     props.put("log4j.appender.KAFKA", "org.keedio.kafka.log4jappender.MockKafkaLog4jAppender");
-    props.put("log4j.appender.KAFKA.layout", "org.apache.log4j.PatternLayout");
-    props.put("log4j.appender.KAFKA.layout.ConversionPattern", "%-5p: %c - %m%n");
     props.put("log4j.appender.KAFKA.BrokerList", "127.0.0.1:9093");
     props.put("log4j.appender.KAFKA.Topic", "test-topic");
-    props.put("log4j.appender.KAFKA.Hostname", "test-hostname");
     props.put("log4j.appender.KAFKA.RequiredNumAcks", "1");
     props.put("log4j.appender.KAFKA.SyncSend", "false");
     props.put("log4j.logger.kafka.log4j", "INFO, KAFKA");

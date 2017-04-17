@@ -26,6 +26,8 @@ import org.apache.log4j.helpers.LogLog;
 import org.apache.log4j.spi.LoggingEvent;
 import org.keedio.kafka.custom.CustomFunctionality;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
@@ -51,6 +53,7 @@ public class KafkaLog4jAppender extends AppenderSkeleton {
 
   private String brokerList = null;
   private String topic = null;
+  private String hostName = null;
   private String compressionType = null;
   private String securityProtocol = null;
   private String sslTruststoreLocation = null;
@@ -58,7 +61,6 @@ public class KafkaLog4jAppender extends AppenderSkeleton {
   private String sslKeystoreType = null;
   private String sslKeystoreLocation = null;
   private String sslKeystorePassword = null;
-  private String hostname = null;
 
   private int retries = 0;
   private int requiredNumAcks = Integer.MAX_VALUE;
@@ -109,9 +111,16 @@ public class KafkaLog4jAppender extends AppenderSkeleton {
     this.topic = topic;
   }
 
-  public String getHostname() {return hostname; }
+  public String getHostName() { return hostName; }
 
-  public void setHostname(String hostname) {this.hostname = hostname; }
+  public void setHostName() {
+    try {
+      this.hostName = InetAddress.getLocalHost().getHostName();
+    } catch (UnknownHostException e) {
+      this.hostName = null;
+      e.printStackTrace();
+    }
+  }
 
   public boolean getSyncSend() {
     return syncSend;
@@ -221,7 +230,7 @@ public class KafkaLog4jAppender extends AppenderSkeleton {
   @Override
   protected void append(LoggingEvent event) {
     CustomFunctionality cf = new CustomFunctionality();
-    String message = cf.subAppend(event, topic, hostname);
+    String message = cf.subAppend(event, topic, hostName);
     LogLog.debug("[" + new Date(event.getTimeStamp()) + "]" + message);
     Future<RecordMetadata> response = producer.send(new ProducerRecord<byte[], byte[]>(topic, message.getBytes()));
     if (syncSend) {
