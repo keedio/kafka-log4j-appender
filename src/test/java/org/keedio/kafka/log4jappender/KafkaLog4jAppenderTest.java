@@ -51,8 +51,6 @@ public class KafkaLog4jAppenderTest {
     props = new Properties();
     props.put("log4j.rootLogger", "INFO");
     props.put("log4j.appender.KAFKA", "org.keedio.kafka.log4jappender.KafkaLog4jAppender");
-    props.put("log4j.appender.KAFKA.layout", "org.apache.log4j.PatternLayout");
-    props.put("log4j.appender.KAFKA.layout.ConversionPattern", "%-5p: %c - %m%n");
     props.put("log4j.appender.KAFKA.brokerList", "127.0.0.1:9093");
     props.put("log4j.logger.kafka.log4j", "INFO, KAFKA");
 
@@ -84,8 +82,6 @@ public class KafkaLog4jAppenderTest {
     Properties props = new Properties();
     props.put("log4j.rootLogger", "INFO, KAFKA");
     props.put("log4j.appender.KAFKA", "org.keedio.kafka.log4jappender.MockKafkaLog4jAppender");
-    props.put("log4j.appender.KAFKA.layout", "org.apache.log4j.PatternLayout");
-    props.put("log4j.appender.KAFKA.layout.ConversionPattern", "%-5p: %c - %m%n");
     props.put("log4j.appender.KAFKA.BrokerList", "127.0.0.1:9093");
     props.put("log4j.appender.KAFKA.Topic", "test-topic");
     props.put("log4j.appender.KAFKA.RequiredNumAcks", "1");
