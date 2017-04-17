@@ -58,6 +58,7 @@ public class KafkaLog4jAppender extends AppenderSkeleton {
   private String sslKeystoreType = null;
   private String sslKeystoreLocation = null;
   private String sslKeystorePassword = null;
+  private String hostname = null;
 
   private int retries = 0;
   private int requiredNumAcks = Integer.MAX_VALUE;
@@ -107,6 +108,10 @@ public class KafkaLog4jAppender extends AppenderSkeleton {
   public void setTopic(String topic) {
     this.topic = topic;
   }
+
+  public String getHostname() {return hostname; }
+
+  public void setHostname(String hostname) {this.hostname = hostname; }
 
   public boolean getSyncSend() {
     return syncSend;
@@ -216,7 +221,7 @@ public class KafkaLog4jAppender extends AppenderSkeleton {
   @Override
   protected void append(LoggingEvent event) {
     CustomFunctionality cf = new CustomFunctionality();
-    String message = cf.subAppend(event);
+    String message = cf.subAppend(event, topic, hostname);
     LogLog.debug("[" + new Date(event.getTimeStamp()) + "]" + message);
     Future<RecordMetadata> response = producer.send(new ProducerRecord<byte[], byte[]>(topic, message.getBytes()));
     if (syncSend) {
@@ -238,7 +243,7 @@ public class KafkaLog4jAppender extends AppenderSkeleton {
   }
 
   public boolean requiresLayout() {
-    return true;
+    return false;
   }
 
 }

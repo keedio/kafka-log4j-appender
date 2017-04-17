@@ -100,6 +100,7 @@ public class KafkaLog4jAppenderTest {
     props.put("log4j.appender.KAFKA.layout.ConversionPattern", "%-5p: %c - %m%n");
     props.put("log4j.appender.KAFKA.BrokerList", "127.0.0.1:9093");
     props.put("log4j.appender.KAFKA.Topic", "test-topic");
+    props.put("log4j.appender.KAFKA.Hostname", "test-hostname");
     props.put("log4j.appender.KAFKA.RequiredNumAcks", "1");
     props.put("log4j.appender.KAFKA.SyncSend", "false");
     props.put("log4j.logger.kafka.log4j", "INFO, KAFKA");

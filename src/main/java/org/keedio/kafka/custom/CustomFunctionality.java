@@ -13,24 +13,26 @@ import java.util.TreeMap;
  */
 public class CustomFunctionality extends KafkaLog4jAppender {
 
-  private static Map<String, Object> eventToMap(final LoggingEvent event) {
+  private static Map<String, Object> eventToMap(final LoggingEvent event, final String topic, final String hostname) {
     final Map<String, Object> em = new TreeMap<String, Object>() {{
-      put("fqnOfCategoryClass", event.getFQNOfLoggerClass());
-      put("categoryName", event.getLogger().getName());
-      put("level", event.getLevel().toString());
-      put("ndc", event.getNDC());
-      put("message", event.getMessage());
-      put("renderedMessage", event.getRenderedMessage());
-      put("threadName", event.getThreadName());
-      put("timeStamp", event.getTimeStamp());
-      put("locationInfo", event.getLocationInformation());
-      put("throwableInfo", event.getThrowableInformation());
+      put("event.fqnOfCategoryClass", event.getFQNOfLoggerClass());
+      put("event.categoryName", event.getLogger().getName());
+      put("event.level", event.getLevel().toString());
+      put("event.ndc", event.getNDC());
+      put("event.message", event.getMessage());
+      put("event.renderedMessage", event.getRenderedMessage());
+      put("event.threadName", event.getThreadName());
+      put("event.timeStamp", event.getTimeStamp());
+      put("event.locationInfo", event.getLocationInformation());
+      put("event.throwableInfo", event.getThrowableInformation());
+      put("topic", topic);
+      put("hostname", hostname);
     }};
     return em;
   }
 
-  public String subAppend(LoggingEvent event) {
-    Map eventAsMap = eventToMap(event);
+  public String subAppend(LoggingEvent event, String topic, String hostname) {
+    Map eventAsMap = eventToMap(event, topic, hostname);
     String json = null;
     try {
       json = new ObjectMapper().writeValueAsString(eventAsMap);
