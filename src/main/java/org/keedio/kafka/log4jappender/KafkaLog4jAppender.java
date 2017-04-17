@@ -111,17 +111,6 @@ public class KafkaLog4jAppender extends AppenderSkeleton {
     this.topic = topic;
   }
 
-  public String getHostName() { return hostName; }
-
-  public void setHostName() {
-    try {
-      this.hostName = InetAddress.getLocalHost().getHostName();
-    } catch (UnknownHostException e) {
-      this.hostName = null;
-      e.printStackTrace();
-    }
-  }
-
   public boolean getSyncSend() {
     return syncSend;
   }
@@ -221,6 +210,15 @@ public class KafkaLog4jAppender extends AppenderSkeleton {
     this.producer = getKafkaProducer(props);
     LogLog.debug("Kafka producer connected to " + brokerList);
     LogLog.debug("Logging for topic: " + topic);
+
+    //hostname information for event information
+    if (hostName == null) {
+      try {
+        hostName = InetAddress.getLocalHost().getHostName();
+      } catch (UnknownHostException e) {
+        e.printStackTrace();
+      }
+    }
   }
 
   protected Producer<byte[], byte[]> getKafkaProducer(Properties props) {

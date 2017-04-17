@@ -18,10 +18,10 @@ public class CustomFunctionality extends KafkaLog4jAppender {
    * Creates a map with the information of the event, topic and hostname
    * @param event the event
    * @param topic the topic
-   * @param hostname the hostname
+   * @param hostName the hostname
    * @return the map
    */
-  private static Map<String, Object> eventToMap(final LoggingEvent event, final String topic, final String hostname) {
+  private static Map<String, Object> eventToMap(final LoggingEvent event, final String topic, final String hostName) {
 
     final Map<String, Object> eventInfo = new TreeMap<String, Object>() {{
       put("fqnOfCategoryClass", event.getFQNOfLoggerClass());
@@ -39,7 +39,7 @@ public class CustomFunctionality extends KafkaLog4jAppender {
     final Map<String, Object> em = new TreeMap<String, Object>() {{
       put("event", eventInfo);
       put("topic", topic);
-      put("hostname", hostname);
+      put("hostName", hostName);
     }};
 
     return em;
