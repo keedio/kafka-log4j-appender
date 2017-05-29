@@ -14,3 +14,4 @@ dependency-reduced-pom.xml
 .gradle
 *.iml
 .idea
+.DS_Store
