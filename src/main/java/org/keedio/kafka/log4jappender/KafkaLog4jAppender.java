@@ -24,7 +24,10 @@ import org.apache.kafka.common.config.SslConfigs;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.helpers.LogLog;
 import org.apache.log4j.spi.LoggingEvent;
+import org.keedio.kafka.custom.CustomFunctionality;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
@@ -50,6 +53,7 @@ public class KafkaLog4jAppender extends AppenderSkeleton {
 
   private String brokerList = null;
   private String topic = null;
+  private String hostName = null;
   private String compressionType = null;
   private String securityProtocol = null;
   private String sslTruststoreLocation = null;
@@ -206,6 +210,15 @@ public class KafkaLog4jAppender extends AppenderSkeleton {
     this.producer = getKafkaProducer(props);
     LogLog.debug("Kafka producer connected to " + brokerList);
     LogLog.debug("Logging for topic: " + topic);
+
+    //hostname information for event information
+    if (hostName == null) {
+      try {
+        hostName = InetAddress.getLocalHost().getHostName();
+      } catch (UnknownHostException e) {
+        e.printStackTrace();
+      }
+    }
   }
 
   protected Producer<byte[], byte[]> getKafkaProducer(Properties props) {
@@ -214,7 +227,8 @@ public class KafkaLog4jAppender extends AppenderSkeleton {
 
   @Override
   protected void append(LoggingEvent event) {
-    String message = subAppend(event);
+    CustomFunctionality cf = new CustomFunctionality();
+    String message = cf.subAppend(event, topic, hostName);
     LogLog.debug("[" + new Date(event.getTimeStamp()) + "]" + message);
     Future<RecordMetadata> response = producer.send(new ProducerRecord<byte[], byte[]>(topic, message.getBytes()));
     if (syncSend) {
@@ -228,10 +242,6 @@ public class KafkaLog4jAppender extends AppenderSkeleton {
     }
   }
 
-  private String subAppend(LoggingEvent event) {
-    return (this.layout == null) ? event.getRenderedMessage() : this.layout.format(event);
-  }
-
   public void close() {
     if (!this.closed) {
       this.closed = true;
@@ -240,6 +250,7 @@ public class KafkaLog4jAppender extends AppenderSkeleton {
   }
 
   public boolean requiresLayout() {
-    return true;
+    return false;
   }
+
 }
