@@ -19,13 +19,14 @@ package org.keedio.kafka.log4jappender;
 import org.apache.kafka.clients.producer.MockProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.log4j.spi.LoggingEvent;
 
 import java.util.Properties;
 
 public class MockKafkaLog4jAppender extends KafkaLog4jAppender {
   private MockProducer mockProducer =
-    new MockProducer(false);
+    new MockProducer(false, new StringSerializer(), new StringSerializer());
 
   @Override
   protected Producer<byte[], byte[]> getKafkaProducer(Properties props) {

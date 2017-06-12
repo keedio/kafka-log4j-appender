@@ -5,7 +5,6 @@ import org.apache.log4j.spi.LoggingEvent;
 import org.apache.spark.SparkContext;
 import org.apache.spark.SparkContext$;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.JavaSparkContext$;
 import scala.Option;
 
 import java.util.Map;
