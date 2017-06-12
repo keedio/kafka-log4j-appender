@@ -17,6 +17,8 @@
 
 package org.keedio.kafka.log4jappender;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.common.config.ConfigException;
@@ -24,12 +26,12 @@ import org.apache.kafka.common.config.SslConfigs;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.helpers.LogLog;
 import org.apache.log4j.spi.LoggingEvent;
-import org.keedio.kafka.custom.CustomFunctionality;
-
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
+import java.util.Map;
 import java.util.Properties;
+import java.util.TreeMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -227,8 +229,7 @@ public class KafkaLog4jAppender extends AppenderSkeleton {
 
   @Override
   protected void append(LoggingEvent event) {
-    CustomFunctionality cf = new CustomFunctionality();
-    String message = cf.subAppend(event, topic, hostName);
+    String message = subAppend(event, topic, hostName);
     LogLog.debug("[" + new Date(event.getTimeStamp()) + "]" + message);
     Future<RecordMetadata> response = producer.send(new ProducerRecord<byte[], byte[]>(topic, message.getBytes()));
     if (syncSend) {
@@ -247,6 +248,55 @@ public class KafkaLog4jAppender extends AppenderSkeleton {
       this.closed = true;
       producer.close();
     }
+  }
+  
+  protected Map<String, Object> generateEventMetadata(final LoggingEvent event){
+    return new TreeMap<String, Object>() {{
+      put("fqnOfCategoryClass", event.getFQNOfLoggerClass());
+      put("categoryName", event.getLogger().getName());
+      put("level", event.getLevel().toString());
+      put("ndc", event.getNDC());
+      put("message", event.getMessage());
+      put("renderedMessage", event.getRenderedMessage());
+      put("threadName", event.getThreadName());
+      put("timeStamp", event.getTimeStamp());
+      put("locationInfo", event.getLocationInformation());
+      put("throwableInfo", event.getThrowableInformation());
+    }};
+  }
+
+  /**
+   * Creates a map with the information of the event, topic and hostname
+   * @param event the event
+   * @param topic the topic
+   * @param hostName the hostname
+   * @return the map
+   */
+  private Map<String, Object> eventToMap(final LoggingEvent event, final String topic, final String hostName) {
+    
+    return new TreeMap<String, Object>() {{
+      put("event", generateEventMetadata(event));
+      put("topic", topic);
+      put("hostName", hostName);
+    }};
+  }
+
+  /**
+   * custom subAppend method originally declared in KafkaLog4hjAppender
+   * @param event the logging event
+   * @param topic the topic
+   * @param hostName the hostName
+   * @return the json that contains the information to be retrieved
+   */
+  private String subAppend(LoggingEvent event, String topic, String hostName) {
+    Map eventAsMap = eventToMap(event, topic, hostName);
+    String json = null;
+    try {
+      json = new ObjectMapper().writeValueAsString(eventAsMap);
+    } catch (JsonProcessingException e) {
+      e.printStackTrace();
+    }
+    return json;
   }
 
   public boolean requiresLayout() {
