@@ -4,9 +4,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <properties>
+        <scala.version>2.11</scala.version>
+    </properties>
+    
     <groupId>org.keedio.kafka.log4jappender</groupId>
-    <artifactId>KafkaLog4jAppender</artifactId>
-    <version>1.2.0-SNAPSHOT</version>
+    <artifactId>kafka-log4j-appender_${scala.version}</artifactId>
+    <version>1.2.1-SNAPSHOT</version>
 
     <build>
         <plugins>
@@ -65,7 +69,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-core_2.11</artifactId>
+            <artifactId>spark-core_${scala.version}</artifactId>
             <version>2.1.1</version>
             <scope>provided</scope>
         </dependency>
