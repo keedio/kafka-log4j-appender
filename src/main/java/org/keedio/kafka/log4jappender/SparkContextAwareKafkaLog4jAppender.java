@@ -23,9 +23,10 @@ public class SparkContextAwareKafkaLog4jAppender extends KafkaLog4jAppender{
     Option<SparkContext> optSparkContext = SparkContext$.MODULE$.getActive();
     
     if (optSparkContext.isDefined()) {
+      LogLog.warn("Spark context found");
       sparkContext = JavaSparkContext.fromSparkContext(optSparkContext.get());
     } else {
-      LogLog.debug("No active Spark context found!");
+      LogLog.warn("No active Spark context found!");
     }
   }
 
