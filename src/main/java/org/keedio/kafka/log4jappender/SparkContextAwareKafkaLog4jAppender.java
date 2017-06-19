@@ -42,11 +42,14 @@ public class SparkContextAwareKafkaLog4jAppender extends KafkaLog4jAppender {
     if (sparkContext == null) {
       initSparkContext();
     }
-    String appId = sparkContext.getConf().getAppId();
-    String appName = sparkContext.appName();
+    
+    if(sparkContext != null){
+      String appId = sparkContext.getConf().getAppId();
+      String appName = sparkContext.appName();
 
-    metadata.put("sparkAppId", appId);
-    metadata.put("sparkAppName", appName);
+      metadata.put("sparkAppId", appId);
+      metadata.put("sparkAppName", appName);
+    }
     
     return metadata;
   }
