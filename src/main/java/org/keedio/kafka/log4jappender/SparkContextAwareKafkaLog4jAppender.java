@@ -5,7 +5,9 @@ import org.apache.log4j.helpers.LogLog;
 import org.apache.log4j.spi.LoggingEvent;
 import org.apache.spark.SparkContext;
 import org.apache.spark.SparkContext$;
+import org.apache.spark.TaskContext;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.broadcast.Broadcast;
 import scala.Option;
 
 import java.util.Map;
@@ -15,39 +17,31 @@ import java.util.Map;
  */
 public class SparkContextAwareKafkaLog4jAppender extends KafkaLog4jAppender {
 
-  protected JavaSparkContext sparkContext = null;
-
-  @Override
-  public void activateOptions() {
-    super.activateOptions();
-
-    initSparkContext();
-  }
-
-  private void initSparkContext() {
-    Option<SparkContext> optSparkContext = SparkContext$.MODULE$.getActive();
-
-    if (optSparkContext.isDefined()) {
-      LogLog.warn("Spark context found");
-      sparkContext = JavaSparkContext.fromSparkContext(optSparkContext.get());
-    } else {
-      LogLog.warn("No active Spark context found!");
-    }
-  }
+  public static final String SPARK_CUSTOM_APPLICATION_ID = "spark.custom.application.id";
+  public static final String SPARK_CUSTOM_APPLICATION_NAME = "spark.custom.application.name";
+  public static final String SPARK_APP_ID = "sparkAppId";
+  public static final String SPARK_APP_NAME = "sparkAppName";
+  public static final String SPARK_STAGE_ID = "sparkStageId";
+  public static final String SPARK_PARTITION_ID = "sparkPartitionId";
 
   @Override
   protected Map<String, Object> generateEventMetadata(LoggingEvent event) {
     Map<String, Object> metadata = super.generateEventMetadata(event);
 
-    if (sparkContext == null) {
-      initSparkContext();
-    }
-    String appId = sparkContext.getConf().getAppId();
-    String appName = sparkContext.appName();
-
-    metadata.put("sparkAppId", appId);
-    metadata.put("sparkAppName", appName);
+    TaskContext context = TaskContext.get();
     
+    if (context != null) {
+      String appId = context.getLocalProperty(SPARK_CUSTOM_APPLICATION_ID);
+      String appName = context.getLocalProperty(SPARK_CUSTOM_APPLICATION_NAME);
+
+      if (appId != null)
+        metadata.put(SPARK_APP_ID, appId);
+      if (appName != null)
+        metadata.put(SPARK_APP_NAME, appName);
+
+      metadata.put(SPARK_STAGE_ID, context.stageId());
+      metadata.put(SPARK_PARTITION_ID, context.partitionId());
+    }
     return metadata;
   }
 }
